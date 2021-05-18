@@ -15,6 +15,7 @@ from requests.packages.urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 
@@ -28,7 +29,7 @@ def read_root():
 
 @app.get("/urls/{urls}")
 def read_item(urls: str, q: Optional[str] = None):
-
+    global dtv, cluster
 
     names = ['Salsa dancing', 'Sensory deprivation', 'Marathon', 'Software','Financial institution', 'Random forests','Linear regression','Football', 'Natural language Processing', 'Handstands', 'Yoga', 'Cluster analysis', 'Water polo', 'Teller','Supervised Learning','Cyber Security','Data Science','Artificial intelligence','European Central Bank','Financial technology','International Monetary Fund','Basketball','Swimming', 'Soccer']
     my_url = []
@@ -194,7 +195,24 @@ def read_item(urls: str, q: Optional[str] = None):
     docs_df
     return {"Categories": docs_df[['title', 'top_name']]} #, "q": q}
 
+@app.get("/image")
+async def main():
+    # VISUALIZATION
+    # Prepare data
+    umap_data = umap.UMAP(n_neighbors=2, n_components=2, min_dist=0.0, metric='cosine').fit_transform(dtv)
+    result = pd.DataFrame(umap_data, columns=['x', 'y'])
+    result['labels'] = cluster.labels_
 
+    # Visualize clusters
+    fig, ax = plt.subplots(figsize=(20, 10))
+    outliers = result.loc[result.labels == -1, :]
+    clustered = result.loc[result.labels != -1, :]
+    plt.scatter(outliers.x, outliers.y, color='#BDADBD', s=10)
+    plt.scatter(clustered.x, clustered.y, c=clustered.labels, s=10, cmap='hsv_r')
+    plt.colorbar()
+    plt.show();
+    plt.savefig('clusters.png')
+    return FileResponse("clusters.jpg", media_type="image/jpg")
 # @app.get("/items/{item_id}")
 # def read_item(item_id: int, q: Optional[str] = None):
 #     return {"item_id": item_id, "q": q}
