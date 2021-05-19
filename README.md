@@ -14,4 +14,4 @@ Then activate your environment by running: conda activate <your-env-name>.
 
 +can put plot (google how to use images in markdown) 
 
-![img](https://github.com/mmrossi/Capstone-Project/Cluster example.png?raw=true)
+![img](https://github.com/mmrossi/Capstone-Project/blob/main/Cluster%20example.png?raw=true)
