@@ -14,12 +14,11 @@ Then activate your environment by running: conda activate <your-env-name>.
 + Open your browser at http://127.0.0.1:8000/docs#/
 + Input the wikipedia titles that you'd like to cluster in the /urls/{urls} parameter box.
 	+ Example: Random forests, Linear Regression, Bitcoin
-+ Execute 
 + Returns titles and labelled categories
 + To return the cluster image, execute the /image parameter.
 
 
 
-+ Example cluster
+Example cluster:
 
 ![img](https://github.com/mmrossi/Capstone-Project/blob/main/Cluster%20example.png?raw=true)
