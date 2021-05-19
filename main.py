@@ -28,7 +28,7 @@ def read_root():
     return {"Hello": "World"}
 
 @app.get("/urls/{urls}")
-def read_item(urls: str, q: Optional[str] = None):
+def read_item(urls: str): #, q: Optional[str] = None):
     global dtv, cluster
 
     names = ['Salsa dancing', 'Sensory deprivation', 'Marathon', 'Software','Financial institution', 'Random forests','Linear regression','Football', 'Natural language Processing', 'Handstands', 'Yoga', 'Cluster analysis', 'Water polo', 'Teller','Supervised Learning','Cyber Security','Data Science','Artificial intelligence','European Central Bank','Financial technology','International Monetary Fund','Basketball','Swimming', 'Soccer']
@@ -88,7 +88,8 @@ def read_item(urls: str, q: Optional[str] = None):
         # 3. Convert to lower case, split into individual words
         words = letters_only.lower().split()                             
         #
-        # 4. In Python, searching a set is much faster than searching a list, so convert the stop words to a set
+        # 4. In Python, searching a set is much faster than searching a list, 
+        # so convert the stop words to a set
         stops = set(stopwords.words("english"))                  
         # 
         # 5. Remove stop words
@@ -104,7 +105,11 @@ def read_item(urls: str, q: Optional[str] = None):
                 for i, doc in enumerate(df.text)]
 
     #instantiate model
-    model = Doc2Vec(vector_size=64, window=2, min_count=1, workers=8, epochs = 40)
+    model = Doc2Vec(vector_size=64, 
+                    window=2, 
+                    min_count=1, 
+                    workers=8, 
+                    epochs = 40)
     #build vocab
     model.build_vocab(card_docs)
     #train model
@@ -148,15 +153,16 @@ def read_item(urls: str, q: Optional[str] = None):
     # plt.show();
     # #########################
 
-    # # new df with topic clusters (numbers)
+    # # create a single document for each cluster of documents
     docs_df = pd.DataFrame(df, columns=['title',"text"])
     docs_df['Topic'] = cluster.labels_
     docs_df['Doc_ID'] = range(len(docs_df))
     docs_per_topic = docs_df.groupby(['Topic'], as_index = False).agg({'text': ' '.join})
 
     # #tfidf but for entire documents in the same cluster number
-    def c_tf_idf(documents, m, ngram_range=(1, 1)):
-        count = CountVectorizer(ngram_range=ngram_range, stop_words="english").fit(documents)
+    def doc_tf_idf(documents, m, ngram_range=(1, 1)):
+        count = CountVectorizer(ngram_range=ngram_range, 
+                                stop_words="english").fit(documents)
         t = count.transform(documents).toarray()
         w = t.sum(axis=1)
         tf = np.divide(t.T, w)
@@ -166,10 +172,10 @@ def read_item(urls: str, q: Optional[str] = None):
 
         return tf_idf, count
     
-    tf_idf, count = c_tf_idf(docs_per_topic.text.values, m=len(df))
+    tf_idf, count = doc_tf_idf(docs_per_topic.text.values, m=len(df))
 
-    # # want to get the top words per topic 
-    def extract_top_n_words_per_topic(tf_idf, count, docs_per_topic, n=20):
+    # # want to get the top words per cluster 
+    def top_n_words_topic(tf_idf, count, docs_per_topic, n=20):
         words = count.get_feature_names()
         labels = list(docs_per_topic.Topic)
         tf_idf_transposed = tf_idf.T
@@ -177,7 +183,7 @@ def read_item(urls: str, q: Optional[str] = None):
         top_n_words = {label: [(words[j], tf_idf_transposed[i][j]) for j in indices[i]][::-1] for i, label in enumerate(labels)}
         return top_n_words
 
-    def extract_topic_sizes(df):
+    def topic_sizes(df):
         topic_sizes = (df.groupby(['Topic'])
                         .text
                         .count()
@@ -186,8 +192,8 @@ def read_item(urls: str, q: Optional[str] = None):
                         .sort_values("Size", ascending=False))
         return topic_sizes
 
-    top_n_words = extract_top_n_words_per_topic(tf_idf, count, docs_per_topic, n=20)
-    topic_sizes = extract_topic_sizes(docs_df); topic_sizes.head(10)
+    top_n_words = top_n_words_topic(tf_idf, count, docs_per_topic, n=20)
+    t_sizes = topic_sizes(docs_df); t_sizes.head(10)
 
     # gimme gimme the labels 
     docs_df['top_name'] = docs_df.Topic.map(lambda x: top_n_words[x][0][0])
@@ -213,10 +219,3 @@ async def main():
     plt.show();
     plt.savefig('clusters.png')
     return FileResponse("clusters.jpg", media_type="image/jpg")
-# @app.get("/items/{item_id}")
-# def read_item(item_id: int, q: Optional[str] = None):
-#     return {"item_id": item_id, "q": q}
-
-# @app.put(".items/{item_id")
-# def update_item(item_id: int, item: Item):
-#     return {"item_price": item.price, "item_id": item_id}

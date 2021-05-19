@@ -12,3 +12,5 @@ Final project -- clustering webpages
 + use requirement file to install all packages
 
 +can put plot (google how to use images in markdown) 
+
+![img](http://i.imgur.com/yourfilename.png)
