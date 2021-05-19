@@ -13,4 +13,4 @@ Final project -- clustering webpages
 
 +can put plot (google how to use images in markdown) 
 
-![img](http://i.imgur.com/yourfilename.png)
+![img](Cluster example.png)
