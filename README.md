@@ -6,12 +6,12 @@ If working in conda, open a terminal and navigate to the project folder. Run the
 Then activate your environment by running: conda activate <your-env-name>.
 
 ## Microsoft Azure
-+ API cloud deployment in progress
++ API cloud deployment in progress.
 
 ## FastAPI
-+ Prepare the environment (see above)
++ Prepare the environment (see above).
 + Run 
 
 +can put plot (google how to use images in markdown) 
 
-![img](Cluster example.png)
+![img](https://github.com/mmrossi/Capstone-Project/Cluster example.png?raw=true)
